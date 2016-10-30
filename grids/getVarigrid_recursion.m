@@ -1,4 +1,4 @@
-function p_idx = getVarigrid_recursion(U, idx1, idx2, minvar, depth, maxdepth)
+function p_idx = getVarigrid_recursion(U, idx1, idx2, minvar, cvc, depth, alldepth, maxdepth)
 
 u = U(idx1, idx2);
 p_idx = [];
@@ -11,9 +11,20 @@ if depth == maxdepth
     return
 end
 
+% Variance criterion.
 v = var(u(:));
 
-if (v > minvar) && (nx1 >= 2) && (nx2 >= 2)
+% Corner value criterion.
+tl = U(idx1(1), idx2(1));
+tr = U(idx1(1), idx2(end));
+bl = U(idx1(end), idx2(1));
+br = U(idx1(end), idx2(end));
+
+d = abs([tl - tr; tr - br; bl - bl; bl - tl; tl - br; tr - bl]);
+
+split = (v > minvar) || (depth <= alldepth) || any(d > cvc);
+
+if split && (nx1 >= 2) && (nx2 >= 2)
     % Split indices into halfs.   
     idx1_split = floor(nx1/2);
     idx1_left = idx1(1:idx1_split);
@@ -28,9 +39,9 @@ if (v > minvar) && (nx1 >= 2) && (nx2 >= 2)
     % Add midpoint of variance-rich area to list of points.
     p_idx = vertcat(p_idx, [idx1_mid idx2_mid]);
     
-    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_left, idx2_left, minvar, depth+1, maxdepth));
-    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_left, idx2_right, minvar, depth+1, maxdepth));
-    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_right, idx2_left, minvar, depth+1, maxdepth));
-    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_right, idx2_right, minvar, depth+1, maxdepth));
+    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_left, idx2_left, minvar, cvc, depth+1, alldepth, maxdepth));
+    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_left, idx2_right, minvar, cvc, depth+1, alldepth, maxdepth));
+    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_right, idx2_left, minvar, cvc, depth+1, alldepth, maxdepth));
+    p_idx = vertcat(p_idx, getVarigrid_recursion(U, idx1_right, idx2_right, minvar, cvc, depth+1, alldepth, maxdepth));
 end
 

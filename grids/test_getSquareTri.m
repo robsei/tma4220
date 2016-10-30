@@ -1,16 +1,20 @@
 clear all; clc; close all;
 
-n1 = 6;
-n2 = 8;
+addpath('../img');
 
-n1 = 77;
-n2 = 77;
+% Load image.
+U = loadCameraman(1, 0.05);
 
-[p tri edge] =  getSquareTri(n1,n2);
+[p tri edge] =  getSquareTri(size(U));
+u = maskApply(U,p);
 
-edge_plotable = [edge ones(size(edge,1),1)];
+subplot(2,2,1);
+imshow(U);
+subplot(2,2,2);
+imtriplot(tri, p, edge);
+subplot(2,2,3);
+imtrisurf(tri, p, u);
+subplot(2,2,4);
+iminterpsurf(tri, p, u, size(U));
 
-subplot(1,2,1);
-triplot(tri, p(:,1), p(:,2));
-subplot(1,2,2);
-triplot(edge_plotable, p(:,1), p(:,2));
+print('../out/test_getSquare','-dpng');

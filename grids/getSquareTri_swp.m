@@ -1,7 +1,10 @@
-function [p, tri, edge] = getSquareTri_swp(n1, n2, u)
+function [p, tri, edge] = getSquareTri_swp(U)
 
-x1 = linspace(0,1,n1);
-x2 = linspace(0,1,n2);
+u = U(:);
+[n1, n2] = size(U);
+
+x1 = 1:n1;
+x2 = 1:n2;
 
 [X1_const, X2_const] = meshgrid(x1, x2);
 
