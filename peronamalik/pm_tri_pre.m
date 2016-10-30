@@ -1,41 +1,4 @@
-clear all; clc; close all;
-
-addpath('../grids');
-addpath('../img');
-addpath('../quadrature');
-
-% Load image.
-U = mat2gray(imread('cameraman.tif'));
-U = imresize(U, 1);
-
-% Parameters for anisotropic diffusion.
-sigma = 0.00001;
-tau = 0.005;
-g = @(x) exp(-(x./2).^2);
-
-% Order of quadrature.
-Nq = 1;
-
-% Grid generation.
-[nx1, nx2] = size(U);
-% [p, tri, edge] =  getSquareTri(nx1,nx2);
-% u = U(:);
-% [p, tri, edge] =  getSquareTri_swp(nx1, nx2, u);
-% [p, tri, edge, p_idx] =  getVarigrid(U, 0.001, 50);
-[p, tri, edge, p_idx] =  getGradgrid(U, 2, @(x) power(x,1));
-
-% Image as vector.
-U = U(sub2ind(size(U), p_idx(:,1), p_idx(:,2)));
-u = U(:);
-
-%dx1 = 1/(nx1-1);
-%dx2 = 1/(nx2-1);
-
-% Verify grid.
-figure;
-% imtrisurf(tri, p, u);
-figure;
-triplot(tri, p(:,1), p(:,2));
+function [u_iso, g_ani, u_ani] = pm_tri_pre(u, tri, p, edge, sigma, tau, g)
 
 % Number of nodes.
 n = size(p,1);
@@ -97,9 +60,6 @@ disp(['The loop took ' num2str(toc) 's.']);
 
 u_iso = (M + sigma * A_iso) \ (M*u);
 
-figure;
-imtrisurf(tri, p, u_iso);
-
 % Compute the diffusion coefficients.
 d = zeros(N,2);
 
@@ -119,15 +79,12 @@ disp(['The loop took ' num2str(toc) 's.']);
 % Apply transfer function.
 g_ani = g(sqrt(d(:,1).^2+d(:,2).^2));
 
-% Visualize the diffusion coeffs
-% figure;
-% plotdiffcoeff(nx1, nx2, g_ani);
-
 disp('Started anisotropic diffusion.');
 tic;
 
 % Each triangle is visited once.
 for k = 1:N
+    nid = tri(k,:);
     for i = 1:3
         for j = 1:3
             A_ani(nid(i),nid(j)) = A_ani(nid(i),nid(j)) + 0.5 * a(k) * g_ani(k) * (phi(1:2,i)' * phi(1:2,j));
@@ -137,10 +94,3 @@ end
 disp(['The loop took ' num2str(toc) 's.']);
 
 u_ani = (M + tau * A_ani) \ (M*u);
-
-% Visualize the results
-figure;
-imtrisurf(tri, p, u_iso);
-
-figure;
-imtrisurf(tri, p, u_ani);

@@ -8,7 +8,7 @@ vq = griddata(p(:,1), p(:,2), u, X1q, X2q, 'natural');
 
 % Plot.
 imagesc(vq);
-axis square
+axis off tight square
 
 end
 
