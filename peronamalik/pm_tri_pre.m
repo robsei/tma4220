@@ -1,4 +1,4 @@
-function [u_iso, g_ani, u_ani] = pm_tri_pre(u, tri, p, edge, sigma, tau, g)
+function [u_ani, A_iso, M, u_iso, g_ani, A_ani] = pm_tri_pre(u, tri, p, edge, sigma, tau, g)
 
 % Number of nodes.
 n = size(p,1);
@@ -6,9 +6,10 @@ n = size(p,1);
 N = size(tri, 1);
 
 % Precompute basis functions and quadrature for later use.
-phi = zeros(3, 3, N);
-a = zeros(N, 1);
-m = ones(N, 3);
+phi = zeros(3, 3, N); % Coefficients of phi: phi(coeff,node,elem).
+a = zeros(N, 1); % Triangle areas.
+m = ones(N, 3); % Triangle midpoints + ones in the right column.
+d = zeros(N,2); % Local gradients.
 
 disp('Precomputations.');
 tic;
@@ -36,7 +37,7 @@ for k = 1:N
 end
 disp(['The loop took ' num2str(toc) 's.']);
 
-% Initialize linear system.
+% Initialize linear systems.
 M = sparse(n,n); % Mass matrix.
 A_iso = sparse(n,n); % Isotropic stiffness matrix.
 A_ani = sparse(n,n); % Anisotropic stiffness matrix.
@@ -60,9 +61,6 @@ disp(['The loop took ' num2str(toc) 's.']);
 
 u_iso = (M + sigma * A_iso) \ (M*u);
 
-% Compute the diffusion coefficients.
-d = zeros(N,2);
-
 disp('Started computation of diffusion coefficients.');
 tic;
 
@@ -70,13 +68,14 @@ tic;
 for k = 1:N
     nid = tri(k,:);
     
+    % See top of p. 228.
     for i = 1:3
         d(k,:) = d(k,:) + u_iso(nid(i)) * phi(1:2,i,k)';
     end
 end
 disp(['The loop took ' num2str(toc) 's.']);
 
-% Apply transfer function.
+% Apply transfer function to the norm of d.
 g_ani = g(sqrt(d(:,1).^2+d(:,2).^2));
 
 disp('Started anisotropic diffusion.');

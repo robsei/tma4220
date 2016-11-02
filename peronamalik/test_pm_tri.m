@@ -22,7 +22,7 @@ g = @(x) exp(-(10*x).^2);
 u = maskApply(U, p);
 
 % Run PM.
-[u_ani, ~, ~, u_iso, ~, ~] = pm_tri_pre(u, tri, p, edge, sigma, tau, g);
+[u_ani, ~, ~, u_iso, ~, ~] = pm_tri(u, tri, p, edge, sigma, tau, g);
 
 % Plot solution.
 subplot(2,2,1);
@@ -35,4 +35,4 @@ subplot(2,2,4);
 iminterpsurf(tri, p, u_ani, size(U));
 
 % Write results to file.
-print('../out/test_pm_tri_pre','-dpng');
+print('../out/test_pm_tri','-dpng');

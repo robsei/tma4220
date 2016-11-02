@@ -3,7 +3,7 @@ clear all; clc; close all;
 addpath('../img');
 
 % Load image.
-U = loadCameraman(1, 0.05);
+U = loadCameraman(0.1, 0.05);
 
 [p, tri, edge] =  getSquareTri_swp(U);
 u = maskApply(U,p);

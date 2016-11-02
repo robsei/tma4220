@@ -9,7 +9,7 @@ nx1 = 100;
 nx2 = 100;
 dx1 = 1/(nx1-1);
 dx2 = 1/(nx2-1);
-[p, tet, edge] = getUniform(nx1, nx2);
+[p, tet, edge] = getSquareTet(nx1, nx2);
 
 % Boundary conditions.
 u = @(X) 1;

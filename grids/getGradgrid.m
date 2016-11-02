@@ -29,7 +29,17 @@ mask(1,end) = 1;
 mask(end,1) = 1;
 mask(end,end) = 1;
 
-[p, tri, edge] = maskDelaunay(mask, size(U));
+[nx1, nx2] = size(U);
+x1 = 1:nx1;
+x2 = 1:nx2;
+[X2, X1] = meshgrid(x1, x2);
+x(:,1) =  X1(mask);
+x(:,2) =  X2(mask);
+
+dt = delaunayTriangulation(x);
+p = dt.Points;
+tri = dt.ConnectivityList;
+edge = freeBoundary(dt);
 
 end
 

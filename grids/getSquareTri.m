@@ -19,9 +19,9 @@ idx_diff = @(idx) [idx(1:end-1); idx(2:end)];
 
 edge_n = idx_diff(1:nx(2))';
 edge_s = idx_diff((nx(1)-1)*nx(2)+1:nx(1)*nx(2))';
-edge_w = idx_diff((0:nx(1)-1)*nx(2)+1)';
+edge_w = idx_diff((nx(1)-1:-1:0)*nx(2)+1)';
 edge_e = idx_diff((1:nx(1))*nx(2))';
 
-edge = [edge_n; edge_s; edge_w; edge_e];
+edge = [edge_n; edge_e; edge_s; edge_w];
 
 end
