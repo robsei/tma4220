@@ -1,23 +1,17 @@
-clear all; clc; close all;
+function u_bd = poisson2d_dirichlet(p, tri, edge, f)
 
 % Load needed functions.
 addpath('../quadrature');
-addpath('../grids');
 
-% Boundary conditions.
-f = @(X) 16 .* pi^2 .* X(1,:) .* X(2,:) .* (X(1,:).^2 + X(2,:).^2) .* sin(2.*pi.*(X(1,:).^2 + X(2,:).^2)) - 24.*X(1,:).*X(2,:).*pi.*cos(2.*pi.*(X(1,:).^2 + X(2,:).^2));
+% Number of points.
+n = size(p, 1);
 
-% Grid construction.
-n = 500;
-theta = 3/2 * pi;
-[p, tri, edge] = getSlice(n, theta);
-
+% Number of elements.
 N = size(tri, 1);
 
-A = zeros(n,n);
+% Prepare linear system.
+A = sparse(n,n);
 b = zeros(n,1);
-
-triplot(tri, p(:,1), p(:,2));
 
 % Each triangle is visited once.
 for k = 1:N
@@ -47,21 +41,15 @@ for k = 1:N
     end
 end
 
+% Boundary treatment.
 A(edge(:,1),:) = [];
 A(:,edge(:,1)) = [];
 b(edge(:,1)) = [];
 u = A \ b;
 
-U = zeros(n,1);
+u_bd = zeros(n,1);
 idx = 1:n;
 idx(edge(:,1)) = [];
-U(idx) = u;
+u_bd(idx) = u;
 
-subplot(1,2,1);
-trimesh(tri, p(:,1), p(:,2), U);
-
-% Verify the result.
-u_true = p(:,1) .* p(:,2) .* sin(2.*pi.*(p(:,1).^2 + p(:,2).^2));
-subplot(1,2,2);
-trimesh(tri, p(:,1), p(:,2), u_true);
-disp(['l2-error of solution is ', num2str(norm(U - u_true))]);
+end
