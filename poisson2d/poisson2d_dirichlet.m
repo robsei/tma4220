@@ -1,4 +1,4 @@
-function u_bd = poisson2d_dirichlet(p, tri, edge, f, Nq)
+function u_bd = poisson2d_dirichlet(p, tri, edge, f)
 
 % Load needed functions.
 addpath('../quadrature');
@@ -13,10 +13,16 @@ N = size(tri, 1);
 A = sparse(n,n);
 b = zeros(n,1);
 
+% Order of integration.
+Nq = 1;
+
 % Visit each triangle once.
 for k = 1:N
     % Get node IDs to identify points and basis functions.
     nid = tri(k,:);
+    p1 = p(nid(1),:);
+    p2 = p(nid(2),:);
+    p3 = p(nid(3),:);
     
     % Compute PHIs that have support in this triangle.
     % Create LHS of the linear system.
@@ -28,9 +34,6 @@ for k = 1:N
     
     % Integrate and update A and b.
     for i = 1:3
-        p1 = p(nid(1),:);
-        p2 = p(nid(2),:);
-        p3 = p(nid(3),:);
         for j = 1:3
             g1 = @(x) dot(phi(1:2,i), phi(1:2,j)) * ones(1, size(x,2));
             A(nid(i),nid(j)) = A(nid(i),nid(j)) + quadrature2D(p1,p2,p3,Nq,g1);
