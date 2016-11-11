@@ -41,15 +41,18 @@ for k = 1:N
     end
 end
 
-% Boundary treatment.
-A(edge(:,1),:) = [];
-A(:,edge(:,1)) = [];
-b(edge(:,1)) = [];
-u = A \ b;
+% Get boundary nodes.
+e = unique(edge(:));
 
-u_bd = zeros(n,1);
+% Get indices of inner points.
 idx = 1:n;
-idx(edge(:,1)) = [];
+idx(e) = [];
+
+% Solve linear system on inner points.
+u = A(idx,idx) \ b(idx);
+
+% Fill in boundary condition.
+u_bd = zeros(n,1);
 u_bd(idx) = u;
 
 end
