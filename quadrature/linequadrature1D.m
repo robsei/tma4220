@@ -24,7 +24,7 @@ x = @(z) (z+1)'*(b-a)/2 + repmat(a, [Nq, 1]);
 h = @(z) g(x(z)');
 
 % Quadrature formula.
-I = 0.5 * h(zq) * rhoq';
+I = 0.5 * norm(b-a) * h(zq) * rhoq';
 
 end
 

@@ -5,7 +5,7 @@ p2 = [1 3];
 Nqs = 1:4;
 g = @(x) x(1,:).^2 + x(2,:).^4;
 
-I_true = 1/3 + (3^4)/5;
+I_true = sqrt(10) * (1/3 + (3^4)/5);
 
 for Nq = Nqs
     I = linequadrature1D(p1,p2,Nq,g);
