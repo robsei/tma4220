@@ -11,13 +11,16 @@ ns = [50, 500, 1000];
 n_max = length(ns);
 theta = 3/2 * pi;
 
+% Integration setting.
+Nq = 1;
+
 % Solve problem for different n.
 for i = 1:n_max
     % Construct the grid.
     [p, tri, edge] = getSlice(ns(i), theta);
     
     % Solve problem
-    u_fem = poisson2d_dirichlet(p, tri, edge, f);
+    u_fem = poisson2d_dirichlet(p, tri, edge, f, Nq);
     
     % Plot FEM solution.
     subplot(n_max, 2, i*2-1);
