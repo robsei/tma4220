@@ -16,6 +16,7 @@
 \newcommand\bslash{\symbol{`\\}}
 
 \DeclareMathOperator{\spn}{span}
+\DeclareMathOperator{\dom}{dom}
 
 \def\ssq{\subseteq}
 \def\N{\mathbb{N}}
@@ -346,15 +347,13 @@ After applying the Finite Element Method to common and abstract cases, we chose 
 
 \section{What is a picture?}
 
-L infty
-derivative
-grad u as edge indicator
+In this section, we briefly describe some foundations of mathematical image processing. For this report, we shall assume that a \emph{continuous image} $u$ is an element of $L^\infty(\R^2)$, where each point in $\dom(u)$ maps to its corresponding grayscale value. Images typically have a compact support. When we take a picture, we generate a discretization of that functions $u$ which is an element of $\R^{n_1 \times n_2}$. Generally, we can take horizontal and vertical derivatives of images, when we assume $u \in L^\infty(\R^2) \cap C^1(\R^2$). There derivatives are numerically approximated by first order differences and can be interpreted as \emph{edges}, when they take relatively high values.
 
-We also calculate also the PSNR by taking the initial rescaled image without noise as a reference. The PSNR (peak signal to noise ratio) is a tool that allows us to measure the quality of our reconstruction. 
+We also calculate also the \emph{peak-signal-to-noise ratio} (PSNR) by taking the initial rescaled image without noise as a reference. The PSNR is a tool that allows us to measure the quality of our reconstruction.
 
 \section{The Perona-Malik Equation and Finite Elements}
 
-\subsection{Diffusion Equation}
+\subsection{Diffusion Equation} \label{sec:diffeqn}
 
 The Perona-Malik equation \citep{perona1990} is a nonlinear diffusion equation that uses an inhomogeneous diffusivity coefficient,
 \begin{equation} \label{pm}
@@ -419,7 +418,7 @@ where $M_{j,i} = \int_\Omega \phi_i \phi_j \d x$ is the so-called \emph{mass mat
 
 \subsection{First steps} 
 
-We performed several numerical simulations of the Perona-Malik diffusion using the Finite Element Method on 2D images. Our first sample is the \texttt{cameraman} picture, see Figure \ref{cameraman}. We just write $u^0 \in \R^{n_1 \times n_2}$ from now on, to denote the initial data, where $n_1, n_2 \in \N$ denote the image dimensions.
+We performed several numerical simulations of the Perona-Malik diffusion using the Finite Element Method on 2D images. Our first sample is the \texttt{cameraman} picture, see figure \ref{cameraman}. We just write $u^0 \in \R^{n_1 \times n_2}$ from now on, to denote the initial data, where $n_1, n_2 \in \N$ denote the image dimensions.
 
 NOISE GENERATION
 
@@ -597,7 +596,7 @@ Our visual impression is that the image noise is removed while the edges are pre
 		Runtime ID & 52.7717s \\
 		Runtime DC & 0.68412s \\
 		Runtime AD & 27.6838s\\
-		PSNR & 28.9317 \\
+		PSNR & 29.0056 \\
 		Visualization & See figure \ref{vis:firsttry}. \\
 	\end{tabular}
 	\caption{Results of first numerical experiment}
@@ -636,7 +635,7 @@ The program obtained is faster, see table \ref{res:efficient}, were the precompu
 		Runtime ID & 5.4611s \\
 		Runtime DC & 0.1238s \\
 		Runtime AD & 2.3429s \\
-		PSNR & 28.5718 \\
+		PSNR & 28.6091 \\
 		Visualization & See figure \ref{vis:efficient}.\\
 	\end{tabular}
 	\caption{Results of efficiency-improved numerical experiment}
@@ -666,7 +665,7 @@ When we compare the results with the first grid, we notice that the new grid see
 		Runtime ID & 0.33618s & 0.33155s \\
 		Runtime DC & 0.013159s & 0.012268s\\
 		Runtime AD & 0.13707s & 0.13583s\\
-		PSNR & 22.9636 & 26.6234 \\
+		PSNR & 27.0748 & 27.1408 \\
 		Visualization & See figure \ref{vis:diagswp1}. & See figure \ref{vis:diagswp2}. \\
 	\end{tabular}
 	\caption{Results of diagonal swapping}
@@ -704,7 +703,7 @@ The result seems satisfying regarding the few numbers of nodes and elements that
 		Runtime ID & 2.1717s \\
 		Runtime DC & 0.05034s \\
 		Runtime AD & 0.95878s \\
-		PSNR & 23.9111 \\
+		PSNR & 23.9248 \\
 		Visualization & See figure \ref{vis:varigrid}. \\
 	\end{tabular}
 	\caption{Results of variance based grid generation}
@@ -732,14 +731,15 @@ The use of \texttt{getGradgrid} creates a very smooth and \emph{cartoon-like} im
 		Grid generation & \multicolumn{2}{c}{\texttt{getGradgrid}} \\
 		Num. of nodes & \multicolumn{2}{c}{6610} \\
 		Num. of elements & \multicolumn{2}{c}{13158} \\
-		Parameters & $\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$ & $\sigma=0.5$, $\tau=1.4$, $g(x) = e^{-(12 x)^2}$, \\
+		Parameters & \multicolumn{2}{c}{$\sigma=0.5$, $g(x) = e^{-(12 x)^2}$} \\
 		& \multicolumn{2}{c}{$\sigma_\text{imgaussfilt}=2$, $g_\text{transfer}(x) = x$}\\
+		$\tau=$ & 0.8 & 1.4 \\
 		Runtime GG & \multicolumn{2}{c}{0.050293s} \\
 		Runtime PR & 0.32198s & 0.3245s \\
 		Runtime ID & 2.3301s & 2.3281s\\
 		Runtime DC & 0.051472s & 0.052429s \\
 		Runtime AD & 1.0208s & 1.0213s \\
-		PSNR & 23.8114 \\
+		PSNR & 23.1113 & 23.399 \\
 		Visualization & See figure \ref{vis:gradgrid1}. & See figure \ref{vis:gradgrid2}. \\
 	\end{tabular}
 	\caption{Results of variance based grid generation}
@@ -747,155 +747,157 @@ The use of \texttt{getGradgrid} creates a very smooth and \emph{cartoon-like} im
 \end{table}
 
 \subsection{Parameter modification}
-\subsubsection{The time $\tau$}
 
+\subsubsection{Anisotropic scale $\tau$}
 
-We wanted to see the diffusion on the picture for different values of $\tau$ (figure \ref{t6}). We compare the PNSR (figure \ref{T6}) between the different values and $\tau=1.5$ seems to be the best choice, even when we compare it with other close values ($\tau=2$,$\tau=2.5$,$\tau=3$ ...). \\ 
+We want to see the diffusion on the picture for different values of $\tau$. We compare the PNSR of different scales and present the results in table \ref{res:taus}. Notably, we find an optimal PSNR around $\tau = 0.5$.
 
-
-
-
-
-
-
-% Table of results 
-
-        \begin{figure}[h!]
-        \label{T6}
-        \centering
-         \caption{Table of results for different $\tau$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$ }
-        \begin{tabular}{|c|c|c|c|c|c|c|c|}
-        \hline
-        Method & $\tau=0$ & $\tau=1.5$ & $\tau=5$ & $\tau=5$ & $\tau=10$ & $\tau=50$ & $\tau=100$
-        \\ \hline
-         PSNR  & 26.4 & 27.22 & 25.39 & 24.23 & 21.43 & 20.27 \\
-         \hline
-        \end{tabular}
-        \end{figure}
-
-
-
-
-
-
-\subsubsection{The coefficient $\sigma$}
-
-Then, we wanted to study the effects of the parameter $\sigma$ from the diffusion equation on the picture. We compare the PSNR for the different values of $\sigma$ and the best choice seems to be $\sigma=0$ (see figures \ref{t7} and \ref{T7}). When we compare this choice with other close values ($\sigma=0.1$,$\sigma=0.2$...) we obtain the same result. 
-
-
-       
-
-
-
- \begin{figure}[h!]
-        \centering
-        \label{T7}
-         \caption{Table of results for different $\sigma$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$}
-        \begin{tabular}{|c|c|c|c|c|c|c|}
-        \hline
-        Method & $\sigma=0$ & $\sigma=1.5$ & $\sigma=5$ & $\sigma=10$ & $\sigma=50$ & $\sigma=100$ \\
-        \hline
-        PSNR  & 30.2 & 27.3 & 24.42 & 23.8 & 23.26 & 22.8 \\
-        \hline
-        \end{tabular}
-        \end{figure}
-
-
-
-
-
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|lllllllllll}
+		Image data & \multicolumn{10}{c}{\texttt{cameraman} ($256 \times 256$ pixels)} \\
+		Grid generation & \multicolumn{10}{c}{\texttt{getVarigrid}} \\
+		Num. of nodes & \multicolumn{10}{c}{6610} \\
+		Num. of elements & \multicolumn{10}{c}{13158} \\
+		Parameters & \multicolumn{10}{c}{$\sigma=0.5$, $g(x) = e^{-(12 x)^2}$,} \\
+		& \multicolumn{10}{c}{$\sigma_\text{imgaussfilt}=2$, $\sigma^2_\text{min}=0.0001$, $d_\text{corner}=0.2$,} \\
+		& \multicolumn{10}{c}{$n_\text{mindepth}=4$, $n_\text{maxdepth}=50$} \\
+		$\tau =$ & 0 & 0.5 & 1 & 5 & 10 & 50 & 100 & 500 & 1000 & 5000\\
+		PSNR & 23.9 & 24.1 & 24.0 & 23.4 & 23.0 & 21.3 & 20.4 & 18.2 & 17.1 & 14.2 \\
+		Visualization in fig. &  \ref{vis:taus01} &  \ref{vis:taus02} &  \ref{vis:taus03} &  \ref{vis:taus04} &  \ref{vis:taus05} &  \ref{vis:taus06} &  \ref{vis:taus07} &  \ref{vis:taus08} &  \ref{vis:taus09} &  \ref{vis:taus10} \\
+	\end{tabular}
+	\caption{Results for different values of $\tau$}
+	\label{res:taus}
+\end{table}
 
 \subsubsection{Transfer function}
 
+The modification of the transfer function $g$ can change the way, the diffusion performs on the image. We tested several transfer functions, that satisfy the conditions stated in section \ref{sec:diffeqn}. Namely, we parametrize
+\begin{equation}
+	g(x) = g(x; K)= e^{-(Kx)^2},
+\end{equation}
+and present the results in table \ref{res:gs}.
 
-The modification of the diffusion coefficient, or more precisely the transfer function $g$ can change the way the diffusion processes on the image. We tested several transfer functions that are non-increasing and whose the limit tends toward 0. The choice of the transfer function depends on the application (deleting the noise or keeping the details for example). According to the comparison between the PSNR, the function $g= e^{-{100 x}^2}$ seems to be the best choice (see figure \ref{t8}), the picture keeps many details but is still noisy. The function $g= e^{-{10 x}^2}$ seems to give a good result with a smooth image.  \\
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|lllll}
+		Image data & \multicolumn{4}{c}{\texttt{cameraman} ($256 \times 256$ pixels)} \\
+		Grid generation & \multicolumn{4}{c}{\texttt{getVarigrid}} \\
+		Num. of nodes & \multicolumn{4}{c}{} \\
+		Num. of elements & \multicolumn{4}{c}{} \\
+		Parameters & \multicolumn{4}{c}{$\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(Kx)^2}$,} \\
+		& \multicolumn{4}{c}{$\sigma_\text{imgaussfilt}=2$, $\sigma^2_\text{min}=0.0001$, $d_\text{corner}=0.2$,} \\
+		& \multicolumn{4}{c}{$n_\text{mindepth}=4$, $n_\text{maxdepth}=50$} \\
+		$K =$ & -100 & -10 & -1 & -0.1 \\
+		PSNR & 24.35 & 23.20 & 21.32 & 21.30 \\
+		Visualization &  \multicolumn{4}{c}{See figure \ref{vis:gs}.} \\
+	\end{tabular}
+	\caption{Results for different transfer functions $g$.}
+	\label{res:gs}
+\end{table}
 
+According to the comparison between the PSNR values, $K=100$ seems to be the best choice, the picture keeps many details but is still noisy. The choice $K=10$ seems to give a good result with a smooth image. Generally, the choice of the transfer function depends on the application (e.g. deleting the noise or keeping the details).
 
-%https://books.google.no/books?id=JykChzLVlogC&pg=PA4&lpg=PA4&dq=anisotropic+diffusion+%22transfer+function%22&source=bl&ots=Z3VKxCW-hy&sig=NcAAOPtQ6p_ngSGSEs5GYRoLgdA&hl=fr&sa=X&ved=0ahUKEwjQ5aj0rI_QAhWE3SwKHWGnCp8Q6AEIYTAJ#v=onepage&q=anisotropic%20diffusion%20%22transfer%20function%22&f=false
-%We can also use, fonction continue par morceaux -> for medical data. Depends on what we want regarding the edges etc 
+\subsubsection{Interpolation method}
 
+We tried to modify the visualization method of our results by changing the interpolation method for the anisotropic solution, MATLAB offers \texttt{natural}, \texttt{nearest}, \texttt{linear}, \texttt{cubic}, and \texttt{v4}. There was only a slight difference between most of the method, but we found \texttt{natural} the most appropriate.
 
+\subsubsection{Parameters of grid generation}
 
+The procedures \texttt{getVarigrid} and \texttt{getGradgrid} procedures require a even broader set of parameter choices. We can modify the parameters e.g. in order to increase the numbers of nodes and elements. For the variance based grid generation, we decrease the required \textit{minimum variance} for a split, such that more nodes can be selected, see table \ref{res:minvars}. For the gradient based grid generation, we modify the transfer function $g_\text{transfer}$, see table \ref{res:transfers}. 
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|llll}
+		Image data & \multicolumn{3}{c}{\texttt{cameraman} ($256 \times 256$ pixels)} \\
+		Grid generation & \multicolumn{3}{c}{\texttt{getVarigrid}} \\
+		Num. of nodes & 2970 & 6510 & 12927 \\
+		Num. of elements & 5923 & 12945 & 25660 \\
+		Parameters & \multicolumn{3}{c}{$\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(12 x)^2}$,} \\
+		& \multicolumn{3}{c}{$\sigma_\text{imgaussfilt}=2$, $d_\text{corner}=0.2$,} \\
+		& \multicolumn{3}{c}{$n_\text{mindepth}=4$, $n_\text{maxdepth}=50$} \\
+		$\sigma^2_\text{min}=$ & $10^{-3}$ & $10^{-4}$ & $10^{-5}$ \\
+		PSNR & 22.23 & 23.58 & 24.49 \\
+		Visualization &  \multicolumn{3}{c}{See figure \ref{vis:minvars}.} \\
+	\end{tabular}
+	\caption{Results for different values of $\sigma^2_\text{min}$ in \texttt{getVarigrid}}
+	\label{res:minvars}
+\end{table}
 
-
-
-% function imDifffCoeff -> plots g coeff but only on structured grids
-
-
-
-\subsubsection{Interpolation}
-
-We tried to modify the visualization of our results by changing the interpolation method for the anisotropic solution ("natural","nearest","linear","cubic","v4"). However we don't see any particular differences between the different interpolation methods with the "cameraman" picture. 
-
-
-
-
-\subsubsection{The parameters of the grids}
-
-For the "Variance" and "Gradient" grid, the numbers of nodes and elements are very low regarding the quality of the image. We can modify the parameters in order to increase the numbers of nodes and elements. 
-For the "Variance" grid (see figure \ref{t11}), we decrease the "minimum variance" value, so more nodes can be selected. For the "Gradient grid" (see figure \ref{t12}) we can only modify the function $g_{grad}$ that we defined earlier. 
-
-
-
-
-
-
-\subsubsection{The noise}
-
-
-We wanted to study the different effects of our grids when we increase the noise in the initial picture. So far, if we compare the "ratio" $\frac{PSNR}{NumberOFElement}$ (important for the algorithm's speed), the grids "Variance" and "Gradient" have the best ratio.For a very noisy picture ($\sigma_{noise}=0.2$) we compare the visualizations obtained (figure \ref{t13}). We notice that the "gradient" grid has a less good quality than the other grids, the final picture seems to be even more noisy than the initial one.  
-
-
-
-
-
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|llll}
+		Image data & \multicolumn{3}{c}{\texttt{cameraman} ($256 \times 256$ pixels)} \\
+		Grid generation & \multicolumn{3}{c}{\texttt{getGradgrid}} \\
+		Num. of nodes & 6998 & 2410 & 1277 \\
+		Num. of elements & 13940 & 4808 & 2546 \\
+		Parameters & \multicolumn{3}{c}{$\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(12 x)^2}$} \\
+		& \multicolumn{3}{c}{$\sigma_\text{imgaussfilt}=2$} \\
+		$g_\text{transfer}$ & $x \mapsto x$ & $x \mapsto x^2$ & $x \mapsto x^3$ \\
+		PSNR & 23.26 & 21.11 & 19.17 \\
+		Visualization &  \multicolumn{3}{c}{See figure \ref{vis:transfers}.} \\
+	\end{tabular}
+	\caption{Results for different functions $g_\text{transfer}$ in \texttt{getGradgrid}}
+	\label{res:transfers}
+\end{table}
 
 \subsection{Quadrilateral elements}
 
-\underline{Method}
+\paragraph{Method}
 
-Instead of using triangles, we thought we could use squares. We performed a Finite element algorithm using squares instead of the triangles. We used analytical computations to make the code faster by computing: 
+Instead of using triangular elements, we thought, we could use square element and exploit the regular structure of image data. We implemented a Finite Element algorithm using squares instead of the triangles. We used analytical computations to make the code faster by computing: 
 
 \begin{itemize}
     \item 
-    The $\phi_i$ functions and their value on the integration point 
+    The basis functions $\phi_i$ and their value on the integration point.
     \item 
-    The integration of the $\phi_i$ functions 
-    
+    The integrations by the midpoint rule.
 \end{itemize}
-
-The visualization shows: 
+The precomputation is done by a MATLAB script that handles symbolic variables and auto-generates the correct MATLAB code for the Finite Element procedure. The visualization shows: 
 \begin{enumerate}
 \item 
-The initial noisy image ($scale=0.5$)
+The initial noisy image
 \item 
 The isotropic solution 
 \item 
 The anisotropic solution
 \end{enumerate}
 
+\paragraph{Results}
 
+We notice a \emph{checkerboard effect} (see figure \ref{vis:gs}) on the visualization of the anisotropic solution. \cite{shukla2013} explain that the checkerboard effect is a common problem of the finite element method. One way to resolve it can be to use higher order Finite Element which leads to a computationally heavier program. Other methods like the \emph{perimeter control technique}, or the \emph{patch technique} are proposed in the paper. We did not continue to work with quadrilateral elements. We summarize this numerical experiment in table \ref{res:tet}.
 
-\underline{Results}
-
-We notice a "checkerboard" effect (figure \ref{t14} and \ref{T14}) on the visualization of the anisotropic solution. The article \cite{shukla2013} explains that the "checkerboard" effect is a common problem of the finite element method. One way to resolve it is to use a higher order finite element but that leads to more expensive program. Other methods are proposed like "the perimeter control technique", or "the patch technique" etc. 
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|ll}
+		Image data & \texttt{cameraman} ($128 \times 128$ pixels) \\
+		Grid generation & \texttt{getSquareTet} \\
+		Num. of nodes & 16384 \\
+		Num. of elements & 16129 \\
+		Parameters & $\sigma=0.5$, $\tau=1$, $g(x) = e^{-(12 x)^2}$ \\
+		Runtime GG & 0.16881s \\
+		Runtime ID & 6.6781s \\
+		Runtime DC & 0.005166s \\
+		Runtime AD & 1.929s \\
+		PSNR & -- \\
+		Visualization & See figure \ref{vis:tet}. \\
+	\end{tabular}
+	\caption{Results for quadrilateral elements}
+	\label{res:tet}
+\end{table}
 
 
 \section{Outlook}
 
-Our work can be applied in several fields that involve image processing. In the medical field, image processing is often used to read information from ultrasound images for example. The goal is to distinguish the layers of different tissues (in order to find a tumor for example), this can be relatively difficult when the image is very noisy. \\
+Our work can be applied in several fields that involve image processing. In the medical field, image processing is often used to exact information from e.g. ultrasound imaging or Magnetic resonance imaging (MRI). The goal is for example to distinguish the layers of different tissues in order to find a tumor. Our algorithm could help to denoise such medical images and facilitate their interpretation for human or machine vision. In future work, our algorithm could be applied on 3D images as well.
 
-We can, in a future work, apply our algorithm on 3D images or use a higher order finite element method. \\
+From the mathematical perspective, it could be useful to develop higher order Finite Element method and increase the accuracy. It should be taken into account that image data is often in high resolution and the application of Finite Elements can become costly. However, the usage of advanced grid generation strategies can help to reduce the computational complexity, as we have shown in this report.
 
-Color images, different encoding, coupled PDEs
+The treatment of color images can be relevant as well. A naive approach here is to use our greyscale Perona-Malix implementation on the (typically three) color layers of the color image. The resulting color fringes can be reduced by employing different color encoding schemes such as the \emph{hue-saturation-value} (HSV) color representation \citep{bredies2010}. The use of multiple coupled PDEs can be another approach to treat color images \citep{bredies2010}.
 
 \chapter{Conclusion}
 
-In this work, we showed how to implement the Perona-Malik diffusion equation using Finite element methods with a relatively fast algorithm. We also showed how to reduce the numbers of elements and nodes (so the algorithm's speed) by focusing on the important zones (edges for example) by using different methods (variance and gradient). The comparison between the different methods leads to choices depending on the application chosen (medical data, picture restoration etc) since different factors have to be taken into account (quality, speed, smoothness). 
+In the first part of the report, we have examined the Poisson equation from various perspectives. In the second part of this report, we showed how to implement the Perona-Malik diffusion equation using Finite Element Methods with an efficient algorithm. We also showed how to reduce the numbers of elements and nodes (so the algorithm's speed) by focusing on the important image areas (edges for example) by using different methods (variance and gradient). The comparison between the different methods leads to choices depending on the application chosen (medical data, picture restoration, etc.), since different factors have to be taken into account (quality, speed, smoothness). 
 
 \bibliography{literature}
 
@@ -914,6 +916,13 @@ In this work, we showed how to implement the Perona-Malik diffusion equation usi
 \end{figure}
 
 \chapter{Figures for Part 2}
+
+\begin{figure}
+	\centering
+	\includegraphics{cameraman.jpg}
+	\caption{The \texttt{cameraman} picture}
+	\label{cameraman}
+\end{figure}
 
 \begin{figure}
 	\centering
@@ -958,279 +967,104 @@ In this work, we showed how to implement the Perona-Malik diffusion equation usi
 	\label{vis:gradgrid2}
 \end{figure}
 
-\chapter{Legacy Figures}
-
- \begin{figure}[h!]
- 	\label{g1}
- 	\centering
- 	\includegraphics[scale=0.7]{g1.jpg}
- \end{figure}
- 
- 
- 
-          \begin{figure}[h!]
-          	\centering
-          	\label{T2}
-          	\begin{tabular}{|c|c|}
-          		\hline
-          		Duration &  Precomputation: 0.85s,
-          		Isotropic diffusion: 5.97s,
-          		Anistropic diffusion:2.7 s   \\
-          		\hline
-          		Number of nodes & 16384 \\
-          		\hline
-          		Number of elements & 32258\\
-          		
-          		\hline
-          		PSNR & 27.36 \\
-          		\hline
-          	\end{tabular}
-          	\caption{Table of results with the pre-computed program : scale=0.5, $\sigma_{noise}=0.05$, $\sigma=0.5$, $\tau=1.5$ }
-          \end{figure}
-          
-          %%% t1: test with test_pm_tri (and getSquareTri) + scale 0.5
-          
-          \begin{figure}[h!]
-          	\centering
-          	\label{t1}
-          	\caption{Visualization with: scale=0.5, $\sigma_{noise}=0.05$  $\sigma=0.5$, $\tau=1.5$ }
-          	\includegraphics[scale=0.8]{t1.jpg}
-          \end{figure}
-          
-          %table of results 
-          \begin{figure}[h!]
-          	\caption{Table of results with: scale=0.5, $\sigma_{noise}=0.05$  $\sigma=0.5$, $\tau=1.5$ }
-          	\centering
-          	\label{T1}
-          	\begin{tabular}{|c|c|}
-          		\hline
-          		Duration &  Isotropic diffusion: 49.6 s
-          		and Anistropic diffusion:27 s   \\
-          		\hline
-          		Number of nodes & 16384 \\
-          		\hline
-          		Number of elements & 32258\\
-          		\hline
-          		PSNR & 27.64\\
-          		\hline
-          	\end{tabular}
-          \end{figure}
-          
-          % t2.jpg test_pm_tri_pre and getSquareTri, scale=0.5, sigma=0.05
-          \begin{figure}
-          	\label{t2}
-          	\caption{Visualization of $u_{ani}$ with the pre-computed program : scale=0.5, $\sigma_{noise}=0.05$  $\sigma=0.5$, $\tau=1.5$ }
-          	\centering
-          	\includegraphics[scale=0.8]{t2.jpg}
-          \end{figure}
-          
- 
- 
- 
- 
- 
- \begin{figure}[h!]
- 	\label{g1-1}
- 	\caption{Visualization of the grid with ${\sigma}_{noise}=0.05$ and $scale=0.1$}
- 	\centering
- 	\includegraphics[scale=0.7]{g1-1.jpg}
- \end{figure}
-
-
-        %t8 test_pm_tri_preG with tau=1.5, s=0.5
-        \begin{figure}
-        	\label{t8}
-        	\centering
-        	\caption{Visualization of the diffusion for different $g$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-        	\includegraphics[scale=0.2]{t8.jpg}
-        \end{figure}
-        
-        
-        
-        
-        
-        \begin{figure}[h!]
-        	\centering
-        	\label{T8}
-        	\caption{Table of results for different $g$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-        	\begin{tabular}{|c|c|c|c|c|c|c|}
-        		\hline
-        		Method & $g= e^{-10 x}$ & $g= e^{-{0.5 x}^2}$ & $g= e^{-{10 x}^2}$ & $g= e^{-{100 x}^2}$ & $g= tanh(5 x)+1$ & $g= 1-x$  \\
-        		\hline
-        		PSNR  & 26.32 & 22.73 & 27.22 & 28.82 & 25.37 & 23.13 \\
-        		\hline
-        	\end{tabular}
-        \end{figure}
-        
-        
-        
-        \begin{figure}
-        	\centering
-        	\label{t9}
-        	\caption{Visualization of the diffusion for different interpolation methods with the "Swap triangles" grid and $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-        	\includegraphics[scale=0.2]{t9.jpg}
-        \end{figure}
-
-
-
-% g2.jpg test_getSquareTri_swp for scale=0.1
-\begin{figure}
-	\label{g2}
-	\centering
-	\caption{Visualization of the "Swap Diagonal" grid for $scale=0.1$, and $\sigma_{noise}=0.05$}
-	\includegraphics[scale=0.8]{g2.jpg}
-\end{figure}
-
-
-%t3 test_pm_tri_pre with getSquareTri_swp scale=0.5
-\begin{figure}
-	\label{t3}
-	\centering
-	\caption{Visualization of $u_{ani}$ with: the "Swap Diagonal" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-	\includegraphics[scale=0.8]{t3.jpg}
-\end{figure}
-
-
-
-
-
-\begin{figure}[h!]
-	\centering
-	\caption{Table of results with: the "Swap Diagonal" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-	\label{T3}
-	\begin{tabular}{|c|c|}
-		\hline
-		Duration &  Precomputation: 0.78s,
-		Isotropic diffusion: 5.46s,
-		Anistropic diffusion:2.45 s   \\
-		\hline
-		Number of nodes & 16384 \\
-		\hline
-		Number of elements & 32258\\
-		
-		\hline
-		PSNR & 27.19 \\
-		\hline
-	\end{tabular}
-\end{figure}
-
-
-
 \begin{figure}
 	\centering
-	\label{t11}
-	\caption{Visualization of the diffusion for different "Variance grid" parameters with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-	\includegraphics[scale=0.2]{t11.jpg}
+	\includegraphics[]{../out/report_taus01.png}
+	\caption{Variation of scale, here $\tau = 0$}
+	\label{vis:taus01}
 \end{figure}
 
 \begin{figure}
 	\centering
-	\label{t12}
-	\caption{Visualization of the diffusion for different "Gradient grid" parameters with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-	\includegraphics[scale=0.2]{t12.jpg}
+	\includegraphics[]{../out/report_taus02.png}
+	\caption{Variation of scale, here $\tau = 0.5$}
+	\label{vis:taus02}
 \end{figure}
 
-
-
-\begin{figure}[h!]
-	\label{t13}
+\begin{figure}
 	\centering
-	\caption{Visualization of the diffusion for different grids and $scale=1$, $\sigma_{noise}=0.2$,$\tau=1.5$, $\sigma=0.5$ }
-	\includegraphics[scale=0.2]{t13.jpg}
+	\includegraphics[]{../out/report_taus03.png}
+	\caption{Variation of scale, here $\tau = 1$}
+	\label{vis:taus03}
 \end{figure}
 
-        %t9 test_pm_tri_tet_pre with tau=1.5, s=0.5
-        \begin{figure}
-        	\label{t14}
-        	\centering
-        	\caption{Visualization of the diffusion for a "squares" grids and $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-        	\includegraphics[scale=0.2]{t14.jpg}
-        \end{figure}
-        
-        
-        
-        \begin{figure}
-        	\centering
-        	\caption{Table of results for a "squares" grids and $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$, $\sigma=0.5$ }
-        	\label{T14}
-        	\begin{tabular}{|c|c|}
-        		\hline
-        		Duration &  
-        		Isotropic diffusion: 6.69s,
-        		Anistropic diffusion:1.95 s   \\
-        		\hline
-        		Number of nodes & Number of pixels nx1*nx2 \\
-        		\hline
-        		Number of elements & (nx1-1)*(nx2-1)\\
-        		\hline
-        		PSNR & 16.12 \\
-        		\hline
-        	\end{tabular}
-        \end{figure}
-
-\begin{figure} \label{cameraman}
+\begin{figure}
 	\centering
-	\includegraphics{cameraman.jpg}
-	\caption{The \texttt{cameraman} picture}
+	\includegraphics[]{../out/report_taus04.png}
+	\caption{Variation of scale, here $\tau = 5$}
+	\label{vis:taus04}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus05.png}
+	\caption{Variation of scale, here $\tau = 10$}
+	\label{vis:taus05}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus06.png}
+	\caption{Variation of scale, here $\tau = 50$}
+	\label{vis:taus06}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus07.png}
+	\caption{Variation of scale, here $\tau = 100$}
+	\label{vis:taus07}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus08.png}
+	\caption{Variation of scale, here $\tau = 500$}
+	\label{vis:taus08}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus09.png}
+	\caption{Variation of scale, here $\tau = 1000$}
+	\label{vis:taus09}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_taus10.png}
+	\caption{Variation of scale, here $\tau = 5000$}
+	\label{vis:taus10}
 \end{figure}
 
 \clearpage
 
-% g3.jpg test_getVariGrid(U,sigma=1,minvar=0.003,cvc=0.05,alldepth=3,maxdepth=50) for scale=0.1 
 \begin{figure}
-	\label{g3}
 	\centering
-	\caption{Visualization of the "Variance" grid, $scale=0.1$, $\sigma_{noise}=0.05$}
-	\includegraphics[scale=0.8]{g3.jpg}
+	\includegraphics[]{../out/report_gs.png}
+	\caption{Results for different transfer functions $g$ ($K = -100, -10, -1, -0.1$, in reading direction), see table \ref{res:gs}}
+	\label{vis:gs}
 \end{figure}
 
-
-% Show four pictures 
-
-%t4 test_pm_tri_pre with getVariGrid(U,sigma=2,minvar=,cvc=,alldepth=,maxdepth=) scale=0.5 
 \begin{figure}
-	\label{t4}
 	\centering
-	\caption{Visualization of $u_{ani}$ with: the "Variance" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-	\includegraphics[scale=0.8]{t4.jpg}
+	\includegraphics[]{../out/report_minvars.png}
+	\caption{Different minimal variance ($\sigma^2_\text{min} = 10^{-3}, 10^{-4}, 10^{-5}$, from left to right) in \texttt{getGradgrid} (top row) with corresponding solution (bottom row).}
+	\label{vis:minvars}
 \end{figure}
 
-        % g4.jpg test_getGradGrid(U,sigma=2, g=power(x,1)) for scale=0.1 
-        \begin{figure}
-        	
-        	\centering
-        	\caption{Visualization of the "Gradient" grid, $scale=0.1$, $\sigma_{noise}=0.05$, $\sigma_{GaussFilt}=2$,  $g_{grad}=x$}
-        	\includegraphics[scale=0.8]{g4.jpg}
-        \end{figure}
-        
-        % Figure showing the final image 
-        
-        %t5 test_pm_tri_pre with test_getGradGrid(U,sigma=2, g=power(x,1)) for scale=0.5 
-        \begin{figure}
-        	
-        	\centering
-        	\caption{Visualization of $u_{ani}$ with: the "Gradient" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-        	\includegraphics[scale=0.8]{t5.jpg}
-        \end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_transfers.png}
+	\caption{Results for different functions $g_\text{transfer}$ in \texttt{getGradgrid}, see table \ref{res:transfers}}
+	\label{vis:transfers}
+\end{figure}
 
-
-\clearpage
-
-        %t6 test_pm_tri_preTau with sigma=0.5 and g idem
-        \begin{figure}
-        	\label{t6}
-        	\centering
-        	\caption{Visualization of the diffusion for different $\tau$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$ }
-        	\includegraphics[scale=0.2]{t6.jpg}
-        \end{figure}
-
-        %t7 test_pm_tri_preSigma with tau=1.5
-        \begin{figure}
-        	\label{t7}
-        	\centering
-        	\caption{Visualization of the diffusion for different $\sigma$ with $scale=0.5$, $\sigma_{noise}=0.05$,$\tau=1.5$ }
-        	\includegraphics[scale=0.2]{t7.jpg}
-        \end{figure}
-
+\begin{figure}
+	\centering
+	\includegraphics[]{../out/report_tet.png}
+	\caption{Results for quadrilateral elements with checkerboard effect}
+	\label{vis:tet}
+\end{figure}
 
 \end{document}
