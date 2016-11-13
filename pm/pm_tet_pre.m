@@ -60,21 +60,9 @@ disp(['The loop took ' num2str(toc) 's.']);
 % Compute RHS only once.
 b = M*U(:);
 
-% Treat boundary conditions.
-A_iso(edge(:,1),:) = [];
-A_iso(:,edge(:,1)) = [];
-M(edge(:,1),:) = [];
-M(:,edge(:,1)) = [];
-b(edge(:,1)) = [];
-
 % Solve linear system.
 u_iso = (M + sigma * A_iso) \ b;
-
-% Fill in boundary condition.
-u_iso_bd = zeros(n,1);
-idx = 1:n;
-idx(edge(:,1)) = [];
-u_iso_bd(idx) = u_iso;
+u_iso_bd = u_iso;
 
 disp('Started computation of diffusion coefficients.');
 tic;
@@ -120,18 +108,9 @@ for i = 1:nx1-1
 end
 disp(['The loop took ' num2str(toc) 's.']);
 
-% Treat boundary conditions.
-A_ani(edge(:,1),:) = [];
-A_ani(:,edge(:,1)) = [];
-
 % Solve linear system.
 u_ani = (M + tau * A_ani) \ b;
-
-% Fill in boundary condition.
-u_ani_bd = zeros(n,1);
-idx = 1:n;
-idx(edge(:,1)) = [];
-u_ani_bd(idx) = u_ani;
+u_ani_bd = u_ani;
 
 % Reshape all return values.
 U_iso_bd = reshape(u_iso_bd, nx1, nx2);

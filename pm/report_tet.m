@@ -26,4 +26,4 @@ imshow(U_iso);
 subplot(1,3,3);
 imshow(U_ani);
 
-print('../out/test_pm_tet_pre', '-dpng');
+print('../out/report_tet', '-dpng');

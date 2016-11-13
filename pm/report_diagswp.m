@@ -30,7 +30,7 @@ subplot(2,2,4);
 iminterpsurf(tri, p, u_ani, size(U));
 
 % Print PSNR.
-disp(['PSNR is ' num2str(psnr(U, U_true))]);
+disp(['PSNR is ' num2str(impsnr(p, u_ani, U_true))]);
 
 % Write results to file.
 print('../out/report_diagswp1','-dpng');
@@ -54,7 +54,7 @@ subplot(2,2,4);
 iminterpsurf(tri, p, u_ani, size(U));
 
 % Print PSNR.
-disp(['PSNR is ' num2str(psnr(u_ani, maskApply(U_true, p)))]);
+disp(['PSNR is ' num2str(impsnr(p, u_ani, U_true))]);
 
 % Write results to file.
 print('../out/report_diagswp2','-dpng');
