@@ -1,5 +1,8 @@
 function [p, tri, edge] = getSquareTri(nx)
 
+disp('Started grid generation.');
+tic;
+
 x1 = 1:nx(1);
 x2 = 1:nx(2);
 
@@ -23,5 +26,9 @@ edge_w = idx_diff((nx(1)-1:-1:0)*nx(2)+1)';
 edge_e = idx_diff((1:nx(1))*nx(2))';
 
 edge = [edge_n; edge_e; edge_s; edge_w];
+
+disp(['Grid generation took ' num2str(toc) 's.']);
+disp(['Number of nodes: ' num2str(size(p,1))])
+disp(['Number of elements: ' num2str(size(tri,1))])
 
 end

@@ -1,5 +1,8 @@
 function [p, tri, edge] = getGradgrid(U, sigma, g)
 
+disp('Started grid generation.');
+tic;
+
 % Blur image to remove noise.
 U = imgaussfilt(U, sigma);
 
@@ -40,6 +43,10 @@ dt = delaunayTriangulation(x);
 p = dt.Points;
 tri = dt.ConnectivityList;
 edge = freeBoundary(dt);
+
+disp(['Grid generation took ' num2str(toc) 's.']);
+disp(['Number of nodes: ' num2str(size(p,1))])
+disp(['Number of elements: ' num2str(size(tri,1))])
 
 end
 
