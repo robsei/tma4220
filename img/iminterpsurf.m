@@ -7,7 +7,8 @@ function iminterpsurf(tri, p, u, nx)
 vq = griddata(p(:,1), p(:,2), u, X1q, X2q, 'natural');
 
 % Plot.
-imagesc(vq);
+imshow(vq);
+colormap gray
 axis off tight square
 
 end
