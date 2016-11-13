@@ -474,8 +474,10 @@ The function returns the followings values:
     \item
     \texttt{A\_ani}, the anisotropic stiffness matrix.
 \end{itemize}
-The algorithm can be described in the following way:
+The whole procedure can be described in the following way:
 \begin{enumerate}
+	\item
+	\textbf{Grid generation (GG)}
 	\item
 	\textbf{Isotropic diffusion (ID)}
 	\begin{enumerate}	
@@ -586,15 +588,16 @@ Our visual impression is that the image noise is removed while the edges are pre
 \begin{table}[h]
 	\centering
 	\begin{tabular}{|ll}
-		Image data & \\
+		Image data & \texttt{cameraman} ($128 \times 128$ pixels) \\
 		Grid generation & \texttt{getSquareTri} \\
-		Num. of nodes \\
-		Num. of elements \\
-		Parameters & $\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(10 x)^2}$ \\
-		Runtime ID \\
-		Runtime DC \\
-		Runtime AD \\
-		PSNR \\
+		Num. of nodes & 16384\\
+		Num. of elements & 32258\\
+		Parameters & $\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$ \\
+		Runtime GG & 0.43145s \\
+		Runtime ID & 52.7717s \\
+		Runtime DC & 0.68412s \\
+		Runtime AD & 27.6838s\\
+		PSNR & 28.9317 \\
 		Visualization & See figure \ref{vis:firsttry}. \\
 	\end{tabular}
 	\caption{Results of first numerical experiment}
@@ -618,20 +621,22 @@ In order to make a more efficient implementation, we took the following measures
 
 \paragraph{Results}
 
-The program obtained is faster, see table \ref{res:efficient}. We shall use this version of the code for the further examples.
+The program obtained is faster, see table \ref{res:efficient}, were the precomputation time is denoted as \textit{Runtime PR}. We shall use this version of the code for the further examples.
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{|ll}
-		Image data & \\
+		Image data & \texttt{cameraman} ($128 \times 128$ pixels) \\
 		Grid generation & \texttt{getSquareTri} \\
-		Num. of nodes \\
-		Num. of elements \\
-		Parameters & $\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(10 x)^2}$ \\
-		Runtime ID \\
-		Runtime DC \\
-		Runtime AD \\
-		PSNR \\
+		Num. of nodes & 16384\\
+		Num. of elements & 32258\\
+		Parameters & $\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$ \\
+		Runtime GG & 0.43546s \\
+		Runtime PR & 0.77099s \\
+		Runtime ID & 5.4611s \\
+		Runtime DC & 0.1238s \\
+		Runtime AD & 2.3429s \\
+		PSNR & 28.5718 \\
 		Visualization & See figure \ref{vis:efficient}.\\
 	\end{tabular}
 	\caption{Results of efficiency-improved numerical experiment}
@@ -646,29 +651,27 @@ In order to fit the edges of the image better, we decided to implement an improv
 
 \paragraph{Results}
 
-When we compare the results with the first grid, we notice that the new grid seems to be more adapted to the image.
+When we compare the results with the first grid, we notice that the new grid seems to be more adapted to the image. Table \ref{res:diagswp} summarizes.
 
 \begin{table}[h]
 	\centering
 	\begin{tabular}{|lll}
-		Image data & \\
+		Image data & \multicolumn{2}{c}{\texttt{rhombus} ($40 \times 40$ pixels)} \\
 		Grid generation & \texttt{getSquareTri} & \texttt{getSquareTri\_swp} \\
-		Num. of nodes \\
-		Num. of elements \\
-		Parameters & \multicolumn{2}{c}{$\sigma=0.5$, $\tau=1.5$, $g(x) = e^{-(10 x)^2}$} \\
-		Runtime ID \\
-		Runtime DC \\
-		Runtime AD \\
-		PSNR \\
-		Visualization & See figure \ref{vis:diagonal1}. & See figure \ref{vis:diagonal2}. \\
+		Num. of nodes & \multicolumn{2}{c}{1600} \\
+		Num. of elements & \multicolumn{2}{c}{3042} \\
+		Parameters & \multicolumn{2}{c}{$\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$} \\
+		Runtime GG & 0.009271s & 0.008785s \\
+		Runtime PR & 0.078194s & 0.07624s \\
+		Runtime ID & 0.33618s & 0.33155s \\
+		Runtime DC & 0.013159s & 0.012268s\\
+		Runtime AD & 0.13707s & 0.13583s\\
+		PSNR & 22.9636 & 26.6234 \\
+		Visualization & See figure \ref{vis:diagswp1}. & See figure \ref{vis:diagswp2}. \\
 	\end{tabular}
 	\caption{Results of diagonal swapping}
-	\label{res:efficient}
+	\label{res:diagswp}
 \end{table}
-
-
-
-
 
 \subsubsection{Using variance information}
 
@@ -676,104 +679,72 @@ When we compare the results with the first grid, we notice that the new grid see
 
 Intuitively speaking, it is not necessary to use a high resolution grid on image areas with few variation. However, the use of a fine grid is indicated in areas with high variation such as corner and edge regions. In order to use less elements in the smooth areas, and more elements in the edge areas we decided to implement a new grid generation strategy by using the \emph{variance} (as known from statistics) as criterion for the local coarseness of the grid.
 
-We implement a recursive procedure as follows: A rectangular image portion is considered to contain enough information for grid refinement if the variance of the image portion lies above a certain threshold. If this is the case, the center of the rectangle is added as new node to the triangulation and the four resulting rectangles are analyzed recursively. We start with the whole image as initial image portion and its corner nodes as initial nodes for the mesh. The triangulation of the so generated point set is computed by MATLAB using built-in \texttt{delaunayTriangulation} procedure.
+We implement a recursive procedure \texttt{getVarigrid} as follows: A rectangular image portion is considered to contain enough information for grid refinement if the variance of the image portion lies above a certain threshold. If this is the case, the center of the rectangle is added as new node to the triangulation and the four resulting rectangles are analyzed recursively. We start with the whole image as initial image portion and its corner nodes as initial nodes for the mesh. The triangulation of the so generated point set is computed by MATLAB using built-in \texttt{delaunayTriangulation} procedure.
 
 \paragraph{Further improvements}
 
-We then added the \emph{corner value criterion} to the procedure. It also allows to perform a split if the absolute difference of any of two corner values are above a certain threshold. Finally, we set a minimal depth and maximal depth for the number of recursive function calls in order to ensure a minimal and maximal grid fineness.
+As improvement, we added a \emph{corner value criterion} to the procedure. It also allows to perform a split if the absolute difference of any of two corner values are above a certain threshold. Finally, we set a minimal depth and maximal depth for the number of recursive function calls in order to ensure a minimal and maximal grid fineness. Because we have to deal with noisy data, there is always a certain amount of noise-induced variance and the variance criterion can be misleading. Our suggestion to overcome this issue is to preprocess the image with a simple Gaussian filter, such as MATLAB's built-in \texttt{imgaussfilt} routine.
 
-and the variance gets split into four quartes when the variance of the portion is higher than a certain value and then we apply a Delaunay triangulation to the points obtained by using the function "delaunayTriangulation". We also use a corner value criterion: if any of the square's edges or the two diagonals is higher than a certain value, we split. We use the both criteria to decide if we split or not the square.  But to use this method properly, we apply first to the image a Gaussian filter (function "imgaussfilt" in Matlab with parameter $\sigma_{GaussFilt}$) to blur the initial image (and the degree of blur depends on $\sigma_{GaussFilt}$) before applying the criteria.  \\
-
-
-
-
-
-
-
-        
-        
-        
 \paragraph{Results}
 
-The result given seems satisfying regarding the few numbers of nodes and elements (see figures \ref{t4} and  \ref{T4}) that are used for the reconstruction. The picture is smooth but it is difficult to distinguish the edges. 
+The result seems satisfying regarding the few numbers of nodes and elements that still yield a good fit of the image data. The performance of the algorithm is improved by the reduced number of nodes and elements. Table \ref{res:varigrid} summarizes this experiment.
 
-% Table of results 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|ll}
+		Image data & \texttt{cameraman} ($256 \times 256$ pixels)\\
+		Grid generation & \texttt{getVarigrid} \\
+		Num. of nodes & 6470 \\
+		Num. of elements & 12866 \\
+		Parameters & $\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$, \\
+		& $\sigma_\text{imgaussfilt}=2$, $\sigma^2_\text{min}=0.0001$, $d_\text{corner}=0.2$, \\
+		& $n_\text{mindepth}=4$, $n_\text{maxdepth}=50$ \\
+		Runtime GG & 0.47358s \\
+		Runtime PR & 0.31019s \\
+		Runtime ID & 2.1717s \\
+		Runtime DC & 0.05034s \\
+		Runtime AD & 0.95878s \\
+		PSNR & 23.9111 \\
+		Visualization & See figure \ref{vis:varigrid}. \\
+	\end{tabular}
+	\caption{Results of variance based grid generation}
+	\label{res:varigrid}
+\end{table}
 
-        \begin{figure}[h!]
-        \centering
-        \label{T4}
-        \caption{Table of results with: the "Variance" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-        \begin{tabular}{|c|c|}
-          \hline
-         Duration &  Precomputation: 0.13s,
-         Isotropic diffusion: 0.75,
-         Anistropic diffusion:0.33 s   \\
-        \hline
-         Number of nodes & 135 \\
-         \hline
-         Number of elements & 259\\
- 
-         \hline
-         PSNR & 23.88 \\
-         \hline
-        \end{tabular}
-        \end{figure}
+\subsubsection{Gradient information and random node sampling}
 
+\paragraph{Method}
 
+An other way to capture image areas with \emph{relevant} information such as corners and edge is the use of gradient information. Intuitively speaking, image domains with a small gradient contain few relevant information while image domains with a high gradient are important for the visual image perception. This idea motivates the following grid generation strategy \texttt{getGradgrid}: We use MATLAB's matrix convolution \texttt{conv2} in order to compute the vertical and horizontal image derivatives. We then normalize the norm of the obtained gradients to values between $0$ and $1$. These values are used as probabilities for each pixel of the image to become a node in the grid. The random sample of grid points is again transformed by \texttt{delaunayTriangulation} to a triangular mesh.
 
+\paragraph{Further improvements}
 
+In order to prevent image noise to bias the gradient values, we apply again Gaussian filtering as a preprocessing step to the image before the grid is generated. We further allow to use a transfer function to map the normalized gradient norms to probability values.
 
+\paragraph{Results}
 
-\subsubsection{Using the gradient}
-\underline{Method}
+The use of \texttt{getGradgrid} creates a very smooth and \emph{cartoon-like} image. We think this comes from the fact that gradient information is taken twice into account: once in the grid generation and once when solving the Perona-Malik equation. This sets a stronger focus on edge preservation and smoothing of already smooth areas. Again, a smaller number of nodes have to be used. Table \ref{res:gradgrid} summarizes this experiment.
 
-
-We decided to also try a gradient criterion to create the grid. 
-We use matrix convolutions (function "conv2" in Matlab) to compute the vertical and horizontal derivatives. Then we normalize the gradient obtained in order to have a number between 0 and 1, and to use it as a probability to be a node. We create a gradient mask with the nodes selected and we apply a Delaunay triangulation (delaunayTriangulation). But to use this method properly, we apply first to the image a Gaussian filter (function "imgaussfilt" in Matlab with parameter $\sigma_{GaussFilt}$) to blur the initial image (and the degree of blur depends on $\sigma_{GaussFilt}$) before applying the gradient mask. We also apply a "transfer function" $g_{grad}$ to the norm of the gradient before selecting the nodes. 
-
-
-
-
-
-
-
-\underline{Results}
-
-Using the "Gradient" grid gives a deeply smooth image. It results from the fact that we use the gradient twice in our analysis (once in the Perona-Malik diffusion equation, and once for the "Gradient" grid). Again, few nodes are used (see figure \ref{T5} for details). 
-
-
-
-
-
-
-
-
-% Table of results 
-
-        \begin{figure}[h!]
-        \centering
-        \caption{Table of results with: the "Gradient" grid, $scale=0.5$, $\sigma_{noise}=0.05$,$\sigma=0.5$, $\tau=1.5$}
-        \label{T5}
-        \begin{tabular}{|c|c|}
-          \hline
-         Duration &  Precomputation: 0.11s,
-         Isotropic diffusion: 0.63,
-         Anistropic diffusion:0.28 s   \\
-        \hline
-         Number of nodes & 197 \\
-         \hline
-         Number of elements & 374\\
- 
-         \hline
-         PSNR & 22.1 \\
-         \hline
-        \end{tabular}
-        \end{figure}
-
-
-
-
-
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|lll}
+		Image data & \multicolumn{2}{c}{\texttt{cameraman} ($256 \times 256$ pixels)} \\
+		Grid generation & \multicolumn{2}{c}{\texttt{getGradgrid}} \\
+		Num. of nodes & \multicolumn{2}{c}{6610} \\
+		Num. of elements & \multicolumn{2}{c}{13158} \\
+		Parameters & $\sigma=0.5$, $\tau=0.8$, $g(x) = e^{-(12 x)^2}$ & $\sigma=0.5$, $\tau=1.4$, $g(x) = e^{-(12 x)^2}$, \\
+		& \multicolumn{2}{c}{$\sigma_\text{imgaussfilt}=2$, $g_\text{transfer}(x) = x$}\\
+		Runtime GG & \multicolumn{2}{c}{0.050293s} \\
+		Runtime PR & 0.32198s & 0.3245s \\
+		Runtime ID & 2.3301s & 2.3281s\\
+		Runtime DC & 0.051472s & 0.052429s \\
+		Runtime AD & 1.0208s & 1.0213s \\
+		PSNR & 23.8114 \\
+		Visualization & See figure \ref{vis:gradgrid1}. & See figure \ref{vis:gradgrid2}. \\
+	\end{tabular}
+	\caption{Results of variance based grid generation}
+	\label{res:gradgrid}
+\end{table}
 
 \subsection{Parameter modification}
 \subsubsection{The time $\tau$}
@@ -920,7 +891,7 @@ Our work can be applied in several fields that involve image processing. In the 
 
 We can, in a future work, apply our algorithm on 3D images or use a higher order finite element method. \\
 
-
+Color images, different encoding, coupled PDEs
 
 \chapter{Conclusion}
 
@@ -945,8 +916,46 @@ In this work, we showed how to implement the Perona-Malik diffusion equation usi
 \chapter{Figures for Part 2}
 
 \begin{figure}
-	\caption{.}
+	\centering
+	\includegraphics[width=\textwidth]{../out/report_firsttry.png}
+	\caption{Visualization of first numerical experiment}
 	\label{vis:firsttry}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_efficient.png}
+	\caption{Visualization of efficiency-improved numerical experiment}
+	\label{vis:efficient}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_diagswp1.png}
+	\caption{Visualization of the \textit{rhombus} denoising without diagonal swap}
+	\label{vis:diagswp1}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_diagswp2.png}
+	\caption{Visualization of the \textit{rhombus} denoising with diagonal swap}
+	\label{vis:diagswp2}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_varigrid.png}
+	\caption{Visualization of the \textit{varigrid} experiment}
+	\label{vis:varigrid}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_gradgrid1.png}
+	\caption{Visualization of the \textit{gradgrid} experiment with $\tau = 0.8$}
+	\label{vis:gradgrid1}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=\textwidth]{../out/report_gradgrid2.png}
+	\caption{Visualization of the \textit{gradgrid} experiment with $\tau = 1.4$}
+	\label{vis:gradgrid2}
 \end{figure}
 
 \chapter{Legacy Figures}
