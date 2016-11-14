@@ -256,7 +256,7 @@ We implement homogeneous Dirichlet boundary conditions by deleting the boundary 
 
 \subsection{Verification}
 
-We solve the system (\ref{poissondirhomlinsys}) and then after verification with the analytical solution (\ref{poissonsol}), we observe that the both the solutions are approximately the same.
+We solve the system (\ref{poissondirhomlinsys}) and then after verification with the analytical solution (\ref{poissonsol}), we observe that the both the solutions are approximately the same, see figure \ref{vis:2dpoissondir}.
 
 \section{Neumann boundary conditions}
 
@@ -347,9 +347,11 @@ After applying the Finite Element Method to common and abstract cases, we chose 
 
 \section{What is a picture?}
 
-In this section, we briefly describe some foundations of mathematical image processing. For this report, we shall assume that a \emph{continuous image} $u$ is an element of $L^\infty(\R^2)$, where each point in $\dom(u)$ maps to its corresponding grayscale value. Images typically have a compact support. When we take a picture, we generate a discretization of that functions $u$ which is an element of $\R^{n_1 \times n_2}$. Generally, we can take horizontal and vertical derivatives of images, when we assume $u \in L^\infty(\R^2) \cap C^1(\R^2$). There derivatives are numerically approximated by first order differences and can be interpreted as \emph{edges}, when they take relatively high values.
+In this section, we briefly describe some foundations of mathematical image processing. For this report, we shall assume that a \emph{continuous image} $u$ is an element of $L^\infty(\R^2)$, where each point in $\dom(u)$ maps to its corresponding grayscale value. Images typically have a compact support. When we take a picture, we generate a discretization of that functions $u$ which is an element of $\R^{n_1 \times n_2}$. Generally, we can take horizontal and vertical derivatives of images, when we assume $u \in L^\infty(\R^2) \cap C^1(\R^2$). These derivatives are numerically approximated by first order differences and can be interpreted as \emph{edges}, when they take relatively high values.
 
-We also calculate also the \emph{peak-signal-to-noise ratio} (PSNR) by taking the initial rescaled image without noise as a reference. The PSNR is a tool that allows us to measure the quality of our reconstruction.
+We also calculate also the \emph{peak-signal-to-noise ratio} (PSNR) and taking the initial image data without noise as a reference. The PSNR is a tool that allows us to measure the quality of our reconstruction.
+
+Our test image is the \texttt{cameraman} image, which is built into MATLAB, see figure \ref{cameraman}. We add to this ground-truth image a Gaussian noise and consider the result as our given initial data.
 
 \section{The Perona-Malik Equation and Finite Elements}
 
@@ -906,12 +908,14 @@ In the first part of the report, we have examined the Poisson equation from vari
 \chapter{Figures for Part 1}
 
 \begin{figure}
-	\caption{Solution of the 2D Poisson equation with homogeneous Dirichlet boundary conditions.}
+	\includegraphics[width=\textwidth]{../out/test_poisson2d_dirichlet.png}
+	\caption{Solution of the 2D Poisson equation with homogeneous Dirichlet boundary conditions, $n=50, 500, 1000$, numerical solution (left column) and analytical solution (right column)}
 	\label{vis:2dpoissondir}
 \end{figure}
 
 \begin{figure}
-	\caption{Solution of the 2D Poisson equation with mixed boundary conditions.}
+	\includegraphics[width=\textwidth]{../out/test_poisson2d_neumann.png}
+	\caption{Solution of the 2D Poisson equation with mixed boundary conditions, $n=50, 500, 1000$, numerical solution (left column) and analytical solution (right column)}
 	\label{vis:2dpoissonneu}
 \end{figure}
 
