@@ -422,10 +422,6 @@ where $M_{j,i} = \int_\Omega \phi_i \phi_j \d x$ is the so-called \emph{mass mat
 
 We performed several numerical simulations of the Perona-Malik diffusion using the Finite Element Method on 2D images. Our first sample is the \texttt{cameraman} picture, see figure \ref{cameraman}. We just write $u^0 \in \R^{n_1 \times n_2}$ from now on, to denote the initial data, where $n_1, n_2 \in \N$ denote the image dimensions.
 
-NOISE GENERATION
-
-We use a noisy image (by adding a random noise of parameter ${\sigma}_{noise}$) and we choose the scale of the initial image. In the figure \ref{g1-1}, the first image in the left represents the initial image that has been rescaled and added noise. The second image shows the mesh grid. Finally the two last images use two different interpolation methods on the grid, that will be developed later. \\
-
 \paragraph{Triangular Mesh}
 
 A naive approach for grid generation is to identify each pixel in the image with a node on the grid. The obtained squares are crossed diagonally to obtain triangles. This procedure yields a grid with $\O(n_1 n_2)$ nodes and $\O(2 n_1 n_2)$ elements. It turns out handy to use the matrix indices as spatial coordinates, i.e. we set $\Omega = [1,n_1] \times [1,n_2]$ and the triangulation nodes $x_{i,j} = (i,j)$ for $i=1,...,n_1$, $j=1,...,n_2$, see figure \ref{gridptpix}.
